@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -28,7 +30,7 @@ public class DatabaseApp {
             System.out.println("Driver Class Loaded...");
        
             try {
-                con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "ompandey");
+                con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?useSSL=false", "root", "");
            
             System.out.println("Connection  established !!!");
             
@@ -48,13 +50,26 @@ public class DatabaseApp {
     public static void main(String[] args) {
         
         DatabaseApp app = new DatabaseApp();
-       app.removeEmployee(21);
-       // app.addEmployee(21, "Santosh", 21000.0);
+//       app.removeEmployee(21);
+//        app.addEmployee(2, "Sabri", 31000.0);
+        app.updateEmployee(1,"Salman", 2000.0);
         app.showemployees();
         
         System.out.println("Hello World!");
     }
     
+    private void updateEmployee(int empno,String name,double salary){
+        try {
+            String sql = "update employee set name=?,salary=? where empno=?"; 
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1,name);
+            stmt.setDouble(2,salary);
+            stmt.setInt(3,empno);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     
     private void removeEmployee(int empno)
     {

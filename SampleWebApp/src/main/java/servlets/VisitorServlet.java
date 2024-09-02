@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.annotation.WebInitParam;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,10 +17,11 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author root
  */
-@WebServlet(name = "TestServlet", urlPatterns = {"/TestServlet"}, initParams = {
-    @WebInitParam(name = "city", value = "Surat"),
-    @WebInitParam(name = "district", value = "Bharuch")})
-public class TestServlet extends HttpServlet {
+@WebServlet(name = "VisitorServlet", urlPatterns = {"/VisitorServlet"})
+public class VisitorServlet extends HttpServlet {
+    
+    int visits;
+    Cookie visitorCookie = null;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,45 +40,47 @@ public class TestServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet TestServlet</title>");            
+            out.println("<title>Servlet VisitorServlet</title>");            
             out.println("</head>");
             out.println("<body>");
             
-        String city =     this.getInitParameter("city");
-        String district =     this.getInitParameter("district");
-       //  String city =   request.getServletContext().getInitParameter("city");
-       
-//       String names[] = request.getParameterValues("ename");
-//       
-//       for(String s : names)
-//       {
-//           out.println("<br/>"+s);
-//       }
-       
-       
-out.println("<br/>Query String :"+request.getQueryString());
-out.println("<br/>Request :"+request.getRemoteAddr());
-out.println("<br/>Local Port :"+request.getLocalPort());
-out.println("<br/>Locale :"+request.getLocale());
-out.println("<br/>SessionId :"+request.getSession().getId());
-
-       
-       
-//        String firstName = request.getParameter("fname");
-//        String lastName = request.getParameter("lname");
-//            
-//            
-//            out.println("<h1>Full Name : "+ firstName +" "+ lastName+ "</h1>");
+            Cookie cookies[] = request.getCookies();
             
-           
-       
-       
-       
-       out.println("<h1>City :"+ city+"</h1>");
-             out.println("<h1>District :"+ district+"</h1>");
-      
-       
-       out.println("<h1>Servlet TestServlet at " + request.getContextPath() + "</h1>");
+            if (cookies != null) {
+                
+                for (Cookie c : cookies) {
+                    if (c.getName().equals("visit")) {
+                        visitorCookie = c;
+                         visits = Integer.parseInt(visitorCookie.getValue()) + 1;
+                        out.println("<h3> You have visited this page " + visits + " times</h3>");
+                        
+                        visitorCookie.setValue(String.valueOf(visits));
+                      //  visitorCookie.setMaxAge(0);
+                        response.addCookie(visitorCookie);
+                        
+                    }
+                }
+                
+                if (visits == 0) {
+                    visitorCookie = new Cookie("visit", "1");
+                    visits = 1;
+                    response.addCookie(visitorCookie);
+                    out.println("<h3> You have visited this page " + visits + " time</h3>");
+                    
+                }
+                
+            } else {
+                
+                visitorCookie = new Cookie("visit", "1");
+                visits = 1;
+                out.println("<h3> You have visited this page " + visits + " time</h3>");
+           // visitorCookie.setMaxAge(0);
+                response.addCookie(visitorCookie);
+                
+            }
+            
+            
+            out.println("<h1>Servlet VisitorServlet at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
